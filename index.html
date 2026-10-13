@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Ejecutivo | Control y Estandarización de Procedimientos</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PapaParse for Google Sheets CSV Sync -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              900: '#0c4a6e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .kpi-card {
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.45);
+    }
+    .kpi-active {
+      outline: 2px solid #38bdf8;
+      border-color: #38bdf8 !important;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- Header Principal -->
+    <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-6 border-b border-slate-800">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Comité de Dirección
+          </span>
+          <span id="syncTimestamp" class="text-xs text-slate-400">Datos consolidados de procedimientos</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+          <i class="fa-solid fa-chart-line text-sky-400 text-2xl"></i>
+          Tablero de Estandarización de Procedimientos
+        </h1>
+        <p class="text-sm text-slate-400 mt-1">Diagnóstico visual, seguimiento de avance operativo y cronograma de criticidad por gerencia.</p>
+      </div>
+
+      <!-- Barra de acciones rápidas -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button onclick="syncGoogleSheets()" id="btnSync" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center gap-2 shadow-lg shadow-emerald-900/30">
+          <i class="fa-solid fa-arrows-rotate" id="syncIcon"></i> <span id="syncText">Sincronizar Sheets</span>
+        </button>
+        <button onclick="openConfigModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+          <i class="fa-solid fa-link text-slate-400"></i> Enlazar Excel
+        </button>
+        <button onclick="toggleFullScreen()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2" title="Pantalla completa">
+          <i class="fa-solid fa-expand text-slate-400"></i> Presentar
+        </button>
+        <button onclick="exportToCSV()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white transition flex items-center gap-2">
+          <i class="fa-solid fa-file-arrow-down"></i> CSV
+        </button>
+      </div>
+    </header>
+
+    <!-- Tarjetas de KPIs Interactivas (Hacer clic filtra la tabla) -->
+    <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      
+      <!-- Total -->
+      <div onclick="filterByQuick('all', this)" id="kpi-all" class="kpi-card glass-panel p-5 rounded-2xl relative overflow-hidden border-sky-500/40 kpi-active">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Universo</span>
+          <i class="fa-solid fa-folder-tree text-sky-400/80 text-base"></i>
+        </div>
+        <div class="mt-3">
+          <span id="kpiTotalVal" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">119</span>
+          <span id="kpiAreasCount" class="text-xs text-slate-400 block mt-0.5">16 Departamentos</span>
+        </div>
+        <div class="mt-3 text-[11px] font-medium text-sky-400 flex items-center gap-1">
+          <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver inventario completo
+        </div>
+      </div>
+
+      <!-- Finalizados -->
+      <div onclick="filterByQuick('finalizado', this)" id="kpi-finalizado" class="kpi-card glass-panel p-5 rounded-2xl relative overflow-hidden border-slate-800 hover:border-emerald-500/50">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Finalizados</span>
+          <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        </div>
+        <div class="mt-3">
+          <span id="kpiFinVal" class="text-3xl sm:text-4xl font-extrabold text-emerald-400 tracking-tight">8</span>
+          <span id="kpiFinPct" class="text-xs text-slate-400 block mt-0.5"><b class="text-emerald-400">6.7%</b> completado</span>
+        </div>
+        <div class="mt-3 text-[11px] font-medium text-emerald-400 flex items-center gap-1">
+          <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver aprobados
+        </div>
+      </div>
+
+      <!-- En Proceso -->
+      <div onclick="filterByQuick('en proceso', this)" id="kpi-proceso" class="kpi-card glass-panel p-5 rounded-2xl relative overflow-hidden border-slate-800 hover:border-amber-500/50">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">En Proceso</span>
+          <i class="fa-solid fa-arrows-rotate text-amber-400 text-base"></i>
+        </div>
+        <div class="mt-3">
+          <span id="kpiProcVal" class="text-3xl sm:text-4xl font-extrabold text-amber-400 tracking-tight">3</span>
+          <span id="kpiProcPct" class="text-xs text-slate-400 block mt-0.5">2.5% en redacción</span>
+        </div>
+        <div class="mt-3 text-[11px] font-medium text-amber-400 flex items-center gap-1">
+          <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver en curso
+        </div>
+      </div>
+
+      <!-- Por Iniciar -->
+      <div onclick="filterByQuick('por iniciar', this)" id="kpi-iniciar" class="kpi-card glass-panel p-5 rounded-2xl relative overflow-hidden border-slate-800 hover:border-slate-600">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Por Iniciar</span>
+          <i class="fa-solid fa-clock text-slate-400 text-base"></i>
+        </div>
+        <div class="mt-3">
+          <span id="kpiPendVal" class="text-3xl sm:text-4xl font-extrabold text-slate-200 tracking-tight">108</span>
+          <span id="kpiPendPct" class="text-xs text-slate-400 block mt-0.5"><b class="text-slate-300">90.8%</b> pendiente</span>
+        </div>
+        <div class="mt-3 text-[11px] font-medium text-slate-400 flex items-center gap-1">
+          <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver pendientes
+        </div>
+      </div>
+
+      <!-- Prioridad Alta -->
+      <div onclick="filterByQuick('alta', this)" id="kpi-alta" class="kpi-card glass-panel p-5 rounded-2xl relative overflow-hidden border-slate-800 hover:border-rose-500/50">
+        <div class="flex justify-between items-start">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-rose-400">Prioridad Alta</span>
+          <i class="fa-solid fa-triangle-exclamation text-rose-400 text-base"></i>
+        </div>
+        <div class="mt-3">
+          <span id="kpiAltaVal" class="text-3xl sm:text-4xl font-extrabold text-rose-400 tracking-tight">47</span>
+          <span id="kpiAltaPct" class="text-xs text-slate-400 block mt-0.5"><b class="text-rose-400">39.5%</b> Críticos</span>
+        </div>
+        <div class="mt-3 text-[11px] font-medium text-rose-400 flex items-center gap-1">
+          <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver foco crítico
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Pestañas de Navegación -->
+    <div class="flex border-b border-slate-800 space-x-6 text-sm font-semibold">
+      <button onclick="switchTab('tab-overview')" id="nav-overview" class="pb-3 border-b-2 border-sky-400 text-sky-400 flex items-center gap-2">
+        <i class="fa-solid fa-chart-pie"></i> Vista Ejecutiva y Gráficos
+      </button>
+      <button onclick="switchTab('tab-table')" id="nav-table" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-table-list"></i> Explorador de Procedimientos (<span id="tabCountBadge">119</span>)
+      </button>
+      <button onclick="switchTab('tab-roadmap')" id="nav-roadmap" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-calendar-check"></i> Cronograma de Entregas Críticas
+      </button>
+    </div>
+
+    <!-- PESTAÑA 1: VISTA EJECUTIVA Y GRÁFICOS -->
+    <div id="tab-overview" class="space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Gráfico 1: Estatus General -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-pie-chart text-emerald-400"></i> Estado General de Avance
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Distribución del portafolio documental</p>
+          </div>
+          <div class="relative h-60 my-4 flex items-center justify-center">
+            <canvas id="chartEstatus"></canvas>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs border-t border-slate-800 pt-3">
+            <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('finalizado')">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1"></span>
+              <span class="text-slate-400">Listo:</span> <b id="lblListo" class="text-emerald-400">8</b>
+            </div>
+            <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('en proceso')">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span>
+              <span class="text-slate-400">Curso:</span> <b id="lblCurso" class="text-amber-400">3</b>
+            </div>
+            <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('por iniciar')">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-500 mr-1"></span>
+              <span class="text-slate-400">Pend:</span> <b id="lblPend" class="text-slate-300">108</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico 2: Matriz de Prioridad -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-rose-400"></i> Nivel de Prioridad Operativa
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Criticidad asignada a cada procedimiento</p>
+          </div>
+          <div class="relative h-60 my-4 flex items-center justify-center">
+            <canvas id="chartPrioridad"></canvas>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs border-t border-slate-800 pt-3">
+            <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('alta')">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 mr-1"></span>
+              <span class="text-slate-400">Alta:</span> <b id="lblAlta" class="text-rose-400">47</b>
+            </div>
+            <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('media')">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mr-1"></span>
+              <span class="text-slate-400">Media:</span> <b id="lblMedia" class="text-amber-400">31</b>
+            </div>
+            <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('baja')">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-sky-400 mr-1"></span>
+              <span class="text-slate-400">Baja:</span> <b id="lblBaja" class="text-sky-400">41</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico 3: Cronograma de Alta Prioridad -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-flag-checkered text-sky-400"></i> Plan de Entregas Críticas
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Meta mensual para procedimientos de Alta Prioridad</p>
+          </div>
+          <div class="relative h-60 my-4">
+            <canvas id="chartCronograma"></canvas>
+          </div>
+          <div class="text-xs text-slate-400 border-t border-slate-800 pt-3 flex items-center justify-between">
+            <span>Ritmo planeado: <b>~3 proc./semana</b></span>
+            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-check"></i> Cierre: Enero 2027</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gráfico 4: Distribución y Avance por Gerencia -->
+      <div class="glass-panel p-6 rounded-2xl">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-building-user text-indigo-400"></i> Procedimientos por Gerencia / Área Operativa (16 Áreas)
+            </h3>
+            <p class="text-xs text-slate-400">Haz clic en cualquier barra para filtrar directamente los procesos de esa gerencia.</p>
+          </div>
+          <div class="flex items-center gap-4 text-xs font-medium">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Finalizados</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500"></span> En Proceso</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-600"></span> Por Iniciar</span>
+          </div>
+        </div>
+        <div class="relative h-[480px]">
+          <canvas id="chartAreas"></canvas>
+        </div>
+      </div>
+
+      <!-- Resumen Ejecutivo para la Toma de Decisiones -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-emerald-500">
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-check-double text-emerald-400"></i> Hito en Cobranzas
+          </h4>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            El área de <b>Cobranzas</b> completó el <b>100%</b> de sus procedimientos (Gestión de cobranza y Recuperación judicial). Representa el primer departamento con estandarización total.
+          </p>
+        </div>
+
+        <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-amber-500">
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Carga Administrativa Central
+          </h4>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            <b>Gestión Humana (17), Finanzas (13) y Legal (12)</b> acumulan 42 de los 119 procedimientos (35.3%). Se recomienda coordinar sesiones de trabajo dedicadas para estas gerencias.
+          </p>
+        </div>
+
+        <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-sky-500">
+          <h4 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-calendar-day text-sky-400"></i> Meta Inmediata (Octubre)
+          </h4>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            El cronograma contempla la validación de <b>12 procedimientos prioritarios</b> antes del <b>30 de octubre de 2026</b>, permitiendo llevar el avance global sobre el 16%.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PESTAÑA 2: EXPLORADOR DE PROCEDIMIENTOS INTERACTIVO -->
+    <div id="tab-table" class="hidden space-y-6">
+      
+      <div class="glass-panel p-5 rounded-2xl space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          
+          <!-- Búsqueda en vivo -->
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+            <input type="text" id="searchInput" oninput="renderTable()" placeholder="Buscar por palabra clave, procedimiento, departamento..." class="w-full bg-slate-900 border border-slate-700 text-slate-200 pl-9 pr-4 py-2 rounded-xl text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none transition">
+          </div>
+
+          <!-- Filtros cruzados -->
+          <div class="flex flex-wrap items-center gap-2.5 text-xs">
+            <select id="areaFilter" onchange="renderTable()" class="bg-slate-900 border border-slate-700 text-slate-200 px-3 py-2 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <option value="all">Todas las Áreas</option>
+            </select>
+
+            <select id="priorityFilter" onchange="renderTable()" class="bg-slate-900 border border-slate-700 text-slate-200 px-3 py-2 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <option value="all">Todas las Prioridades</option>
+              <option value="Alta">Prioridad Alta</option>
+              <option value="Media">Prioridad Media</option>
+              <option value="Baja">Prioridad Baja</option>
+            </select>
+
+            <select id="statusFilter" onchange="renderTable()" class="bg-slate-900 border border-slate-700 text-slate-200 px-3 py-2 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <option value="all">Todos los Estatus</option>
+              <option value="Finalizado">Finalizado</option>
+              <option value="En proceso">En proceso</option>
+              <option value="Por iniciar">Por iniciar</option>
+            </select>
+
+            <button onclick="resetFilters()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate-left"></i> Limpiar
+            </button>
+          </div>
+
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800/80">
+          <div>Mostrando <b id="filteredCount" class="text-white">119</b> de <b id="totalCountFooter" class="text-white">119</b> registros</div>
+          <div class="flex gap-3">
+            <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Finalizado</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> En Proceso</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Por Iniciar</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de resultados -->
+      <div class="glass-panel rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4 w-12 text-center">#</th>
+                <th class="py-3 px-4 cursor-pointer hover:text-white" onclick="sortTable('area')">Gerencia / Área <i class="fa-solid fa-sort ml-1 text-slate-600"></i></th>
+                <th class="py-3 px-4 cursor-pointer hover:text-white" onclick="sortTable('name')">Nombre del Procedimiento <i class="fa-solid fa-sort ml-1 text-slate-600"></i></th>
+                <th class="py-3 px-4 text-center cursor-pointer hover:text-white" onclick="sortTable('priority')">Prioridad <i class="fa-solid fa-sort ml-1 text-slate-600"></i></th>
+                <th class="py-3 px-4 text-center cursor-pointer hover:text-white" onclick="sortTable('status')">Estatus <i class="fa-solid fa-sort ml-1 text-slate-600"></i></th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-800/60 text-slate-200">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PESTAÑA 3: CRONOGRAMA DE ENTREGAS CRÍTICAS -->
+    <div id="tab-roadmap" class="hidden space-y-6">
+      <div class="glass-panel p-6 rounded-2xl">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-800">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-calendar-days text-sky-400"></i> Plan de Culminación: Procedimientos de Alta Prioridad
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">Estrategia por etapas para culminar el 100% de los 47 procedimientos de criticidad alta.</p>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-slate-400">Fecha tope final</div>
+            <div class="text-base font-bold text-emerald-400">29 de Enero de 2027</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+          <div class="bg-slate-900/80 border-2 border-sky-500/50 p-5 rounded-2xl">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 uppercase">Fase 1 - En Curso</span>
+            <h4 class="text-lg font-bold text-white mt-3">Octubre 2026</h4>
+            <div class="text-3xl font-extrabold text-sky-400 mt-1">12 <span class="text-xs font-normal text-slate-400">proc.</span></div>
+            <p class="text-xs text-slate-300 mt-3">Procesos comerciales medulares, facturación complementaria y controles de tesorería.</p>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[11px]">
+              <span class="text-slate-400">Fecha tope:</span>
+              <span class="font-bold text-sky-300">30/10/2026</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-300 uppercase">Fase 2</span>
+            <h4 class="text-lg font-bold text-white mt-3">Noviembre 2026</h4>
+            <div class="text-3xl font-extrabold text-amber-400 mt-1">12 <span class="text-xs font-normal text-slate-400">proc.</span></div>
+            <p class="text-xs text-slate-300 mt-3">Contratos corporativos, representación jurídica y fases de ingreso de Gestión Humana.</p>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[11px]">
+              <span class="text-slate-400">Fecha tope:</span>
+              <span class="font-bold text-amber-300">04/11/2026</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-300 uppercase">Fase 3</span>
+            <h4 class="text-lg font-bold text-white mt-3">Diciembre 2026</h4>
+            <div class="text-3xl font-extrabold text-purple-400 mt-1">10 <span class="text-xs font-normal text-slate-400">proc.</span></div>
+            <p class="text-xs text-slate-300 mt-3">Finanzas críticas (obligaciones fiscales, nómina, cobranzas) e inventarios físicos periódicos.</p>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[11px]">
+              <span class="text-slate-400">Fecha tope:</span>
+              <span class="font-bold text-purple-300">30/12/2026</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-300 uppercase">Fase 4 - Cierre</span>
+            <h4 class="text-lg font-bold text-white mt-3">Enero 2027</h4>
+            <div class="text-3xl font-extrabold text-emerald-400 mt-1">5 <span class="text-xs font-normal text-slate-400">proc.</span></div>
+            <p class="text-xs text-slate-300 mt-3">Garantías técnicas posventa, pólizas y seguros para completar el 100% crítico.</p>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-[11px]">
+              <span class="text-slate-400">Fecha tope:</span>
+              <span class="font-bold text-emerald-300">29/01/2027</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURACIÓN DE GOOGLE SHEETS -->
+    <div id="configModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="glass-panel bg-slate-900 border border-slate-700 w-full max-w-lg p-6 rounded-2xl space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-link text-emerald-400"></i> Enlazar con Google Sheets
+          </h3>
+          <button onclick="closeConfigModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Pega aquí el enlace de <b>Exportación Directa CSV</b> para sincronización en tiempo real sin esperas:
+        </p>
+
+        <div class="space-y-2">
+          <label class="text-[11px] font-semibold text-slate-400 uppercase">URL CSV de Google Sheets</label>
+          <input type="text" id="sheetsCsvUrlInput" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv&gid=0" class="w-full bg-slate-950 border border-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div class="p-3 bg-slate-950/70 rounded-xl text-[11px] text-slate-400 space-y-1.5 border border-slate-800">
+          <div class="font-bold text-slate-200 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info text-sky-400"></i> Enlace recomendado de lectura directa:
+          </div>
+          <div>En tu hoja de cálculo, ve a <b>Compartir</b> &gt; <b>Cualquier persona con el enlace (Lector)</b> y usa el formato con <code>/export?format=csv&gid=...</code> para evitar los 5 minutos de caché de Google.</div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button onclick="closeConfigModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">Cerrar</button>
+          <button onclick="saveAndSync()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-emerald-900/40">
+            <i class="fa-solid fa-check"></i> Guardar y Conectar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="pt-6 border-t border-slate-800 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div>Fuente: Documento INDICADORES &bull; Pestaña LISTADO DE PROCEDIMIENTOS</div>
+      <div class="text-slate-400">Tablero Ejecutivo Interactivo &bull; Comité de Calidad</div>
+    </footer>
+
+  </div>
+
+  <!-- LÓGICA DE CONTROL DEL TABLERO -->
+  <script>
+    const rawProcedures = [{"id": 1, "area": "Dirección ejecutiva", "name": "Procedimiento de planificación estratégica.", "priority": "Media", "status": "Por iniciar"}, {"id": 2, "area": "Dirección ejecutiva", "name": "Procedimiento de aprobación del presupuesto anual.", "priority": "Alta", "status": "Por iniciar"}, {"id": 3, "area": "Dirección ejecutiva", "name": "Procedimiento de seguimiento de metas y resultados.", "priority": "Alta", "status": "Por iniciar"}, {"id": 4, "area": "Dirección ejecutiva", "name": "Procedimiento de reuniones gerenciales y seguimiento de acuerdos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 5, "area": "Dirección ejecutiva", "name": "Procedimiento de aprobación de inversiones y gastos extraordinarios.", "priority": "Baja", "status": "Por iniciar"}, {"id": 6, "area": "Dirección ejecutiva", "name": "Procedimiento de delegación de autoridad.", "priority": "Media", "status": "Por iniciar"}, {"id": 7, "area": "Dirección ejecutiva", "name": "Procedimiento de gestión de crisis y toma de decisiones urgentes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 8, "area": "Tesorería", "name": "Elaboración y aprobación del presupuesto.", "priority": "Baja", "status": "Por iniciar"}, {"id": 9, "area": "Tesorería", "name": "Control presupuestario mensual.", "priority": "Baja", "status": "Por iniciar"}, {"id": 10, "area": "Tesorería", "name": "Pronóstico de flujo de caja.", "priority": "Media", "status": "Por iniciar"}, {"id": 11, "area": "Tesorería", "name": "Administración de cuentas por cobrar y por pagar.", "priority": "Media", "status": "Por iniciar"}, {"id": 12, "area": "Tesorería", "name": "Análisis de rentabilidad por vehículo, modelo, vendedor, taller y servicio.", "priority": "Media", "status": "Por iniciar"}, {"id": 13, "area": "Tesorería", "name": "Cierre financiero mensual.", "priority": "Alta", "status": "Por iniciar"}, {"id": 14, "area": "Tesorería", "name": "Recepción y validación de pagos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 15, "area": "Finanzas", "name": "Conciliaciones bancarias.", "priority": "Alta", "status": "Por iniciar"}, {"id": 16, "area": "Finanzas", "name": "Programación y autorización de pagos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 17, "area": "Finanzas", "name": "Administración de fondos fijos y cajas chicas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 18, "area": "Finanzas", "name": "Anulación y reverso de transacciones.", "priority": "Media", "status": "Por iniciar"}, {"id": 19, "area": "Finanzas", "name": "Registro de ingresos por venta de vehículos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 20, "area": "Finanzas", "name": "Registro de costos de vehículos vendidos.", "priority": "Media", "status": "Por iniciar"}, {"id": 21, "area": "Finanzas", "name": "Cuentas por cobrar y provisiones.", "priority": "Alta", "status": "Por iniciar"}, {"id": 22, "area": "Finanzas", "name": "Cuentas por pagar y recepción de facturas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 23, "area": "Finanzas", "name": "Activos fijos y depreciaciones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 24, "area": "Finanzas", "name": "Inventarios y ajustes contables.", "priority": "Media", "status": "Por iniciar"}, {"id": 25, "area": "Finanzas", "name": "Impuestos y obligaciones fiscales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 26, "area": "Finanzas", "name": "Cierre contable y archivo de soportes.", "priority": "Media", "status": "Por iniciar"}, {"id": 27, "area": "Finanzas", "name": "Debida diligencia de clientes, proveedores y terceros.", "priority": "Media", "status": "Por iniciar"}, {"id": 28, "area": "Cumplimiento", "name": "Monitoreo y reporte de operaciones inusuales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 29, "area": "Cumplimiento", "name": "Capacitación en cumplimiento.", "priority": "Baja", "status": "Por iniciar"}, {"id": 30, "area": "Cumplimiento", "name": "Conservación de expedientes y evidencias.", "priority": "Baja", "status": "Por iniciar"}, {"id": 31, "area": "Cumplimiento", "name": "Emisión de finiquito", "priority": "Alta", "status": "Finalizado"}, {"id": 32, "area": "Cumplimiento", "name": "Seguimiento de cambios normativos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 33, "area": "Legal", "name": "Constitución, poderes y representación legal.", "priority": "Alta", "status": "Por iniciar"}, {"id": 34, "area": "Legal", "name": "Revisión y aprobación de contratos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 35, "area": "Legal", "name": "Contratos de compraventa de vehículos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 36, "area": "Legal", "name": "Contratos de financiamiento, seguros y servicios adicionales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 37, "area": "Legal", "name": "Términos y condiciones de promociones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 38, "area": "Legal", "name": "Gestión de reclamos y demandas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 39, "area": "Legal", "name": "Protección de datos personales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 40, "area": "Legal", "name": "Revisión de publicidad y comunicaciones comerciales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 41, "area": "Legal", "name": "Permisos, licencias y registros regulatorios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 42, "area": "Legal", "name": "Atención de requerimientos de autoridades.", "priority": "Alta", "status": "Por iniciar"}, {"id": 43, "area": "Legal", "name": "Gestión de garantías legales y derechos del consumidor.", "priority": "Alta", "status": "Por iniciar"}, {"id": 44, "area": "Legal", "name": "Control de vencimientos contractuales y regulatorios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 45, "area": "Procura e inventario", "name": "Plan anual de compras.", "priority": "Media", "status": "Por iniciar"}, {"id": 46, "area": "Procura e inventario", "name": "Solicitud interna de compra.", "priority": "Baja", "status": "Por iniciar"}, {"id": 47, "area": "Procura e inventario", "name": "Evaluación, homologación y aprobación de proveedores.", "priority": "Baja", "status": "Por iniciar"}, {"id": 48, "area": "Procura e inventario", "name": "Emisión y aprobación de órdenes de compra.", "priority": "Baja", "status": "Por iniciar"}, {"id": 49, "area": "Procura e inventario", "name": "Compras urgentes.", "priority": "Media", "status": "Por iniciar"}, {"id": 50, "area": "Procura e inventario", "name": "Inventarios cíclicos y físicos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 51, "area": "Procura e inventario", "name": "Devolución a proveedores.", "priority": "Baja", "status": "Por iniciar"}, {"id": 52, "area": "Procura e inventario", "name": "Disposición de bienes obsoletos o dañados.", "priority": "Baja", "status": "Por iniciar"}, {"id": 53, "area": "Comercial", "name": "Ventas Rnlt/VAS", "priority": "Alta", "status": "Finalizado"}, {"id": 54, "area": "Comercial", "name": "Ventas Ducati", "priority": "Alta", "status": "Por iniciar"}, {"id": 55, "area": "Comercial", "name": "Seguimiento de prospectos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 56, "area": "Comercial", "name": "Tratamiento de clientes corporativos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 57, "area": "Comercial", "name": "Aprobación de descuentos especiales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 58, "area": "Comercial", "name": "Manejo de ventas canceladas", "priority": "Alta", "status": "Por iniciar"}, {"id": 59, "area": "Administración", "name": "Facturación", "priority": "Alta", "status": "Finalizado"}, {"id": 60, "area": "Administración", "name": "Notas de crédito y débito", "priority": "Baja", "status": "Por iniciar"}, {"id": 61, "area": "Administración", "name": "Anulaciones", "priority": "Baja", "status": "Por iniciar"}, {"id": 62, "area": "Administración", "name": "Solicitud de pedidos al importador", "priority": "Alta", "status": "Finalizado"}, {"id": 63, "area": "Cobranzas", "name": "Coordinación con Legal para recuperación judicial", "priority": "Alta", "status": "Finalizado"}, {"id": 64, "area": "Cobranzas", "name": "Cobranzas", "priority": "Alta", "status": "Finalizado"}, {"id": 65, "area": "Operaciones", "name": "Inspección de daños", "priority": "Baja", "status": "Por iniciar"}, {"id": 66, "area": "Operaciones", "name": "Reporte de faltantes o daños al fabricante o transportista", "priority": "Media", "status": "Por iniciar"}, {"id": 67, "area": "Operaciones", "name": "Acondicionamiento de vehiculos para entrega", "priority": "Alta", "status": "Por iniciar"}, {"id": 68, "area": "Operaciones", "name": "Actualización del sistema de inventario", "priority": "Media", "status": "Por iniciar"}, {"id": 69, "area": "Operaciones", "name": "Control de vehículos de cortesía", "priority": "Media", "status": "Por iniciar"}, {"id": 70, "area": "Operaciones", "name": "Inventario físico periódico", "priority": "Media", "status": "Por iniciar"}, {"id": 71, "area": "Posventa", "name": "Programacion de citas y recepción de vehículos para mantenimiento", "priority": "Alta", "status": "Finalizado"}, {"id": 72, "area": "Posventa", "name": "Gestión de garantías", "priority": "Alta", "status": "Por iniciar"}, {"id": 73, "area": "Posventa", "name": "Encuesta de satisfacción", "priority": "Baja", "status": "Por iniciar"}, {"id": 74, "area": "Posventa", "name": "Analisis de reclamos", "priority": "Baja", "status": "Por iniciar"}, {"id": 75, "area": "Seguros", "name": "Emisión y entrega de polizas", "priority": "Alta", "status": "En proceso"}, {"id": 76, "area": "Seguros", "name": "Conciliación de primas cobradas", "priority": "Alta", "status": "Por iniciar"}, {"id": 77, "area": "Seguros", "name": "Gestión de renovación", "priority": "Alta", "status": "En proceso"}, {"id": 78, "area": "Seguros", "name": "Reporte, inspección y resolución de siniestros", "priority": "Alta", "status": "En proceso"}, {"id": 79, "area": "Mercadeo", "name": "Control de presupuesto", "priority": "Alta", "status": "Por iniciar"}, {"id": 80, "area": "Mercadeo", "name": "Gestión de eventos y lanzamientos.", "priority": "Media", "status": "Por iniciar"}, {"id": 81, "area": "Mercadeo", "name": "Gestión de redes sociales", "priority": "Baja", "status": "Por iniciar"}, {"id": 82, "area": "Mercadeo", "name": "Captación y registro de leads", "priority": "Media", "status": "Por iniciar"}, {"id": 83, "area": "Mercadeo", "name": "Recepción de consultas y reclamos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 84, "area": "Gestión humana", "name": "Reclutamiento y selección.", "priority": "Alta", "status": "Por iniciar"}, {"id": 85, "area": "Gestión humana", "name": "Verificación de referencias.", "priority": "Alta", "status": "Por iniciar"}, {"id": 86, "area": "Gestión humana", "name": "Contratación e ingreso.", "priority": "Alta", "status": "Por iniciar"}, {"id": 87, "area": "Gestión humana", "name": "Inducción general y específica por cargo.", "priority": "Baja", "status": "Por iniciar"}, {"id": 88, "area": "Gestión humana", "name": "Capacitación técnica, comercial y de cumplimiento.", "priority": "Baja", "status": "Por iniciar"}, {"id": 89, "area": "Gestión humana", "name": "Evaluación de desempeño.", "priority": "Baja", "status": "Por iniciar"}, {"id": 90, "area": "Gestión humana", "name": "Planes de carrera y sucesión.", "priority": "Baja", "status": "Por iniciar"}, {"id": 91, "area": "Gestión humana", "name": "Gestión de vacaciones y ausencias.", "priority": "Media", "status": "Por iniciar"}, {"id": 92, "area": "Gestión humana", "name": "Control de asistencia.", "priority": "Baja", "status": "Por iniciar"}, {"id": 93, "area": "Gestión humana", "name": "Nómina y beneficios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 94, "area": "Gestión humana", "name": "Gestión disciplinaria.", "priority": "Media", "status": "Por iniciar"}, {"id": 95, "area": "Gestión humana", "name": "Seguridad y salud laboral.", "priority": "Media", "status": "Por iniciar"}, {"id": 96, "area": "Gestión humana", "name": "Entrega y devolución de activos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 97, "area": "Gestión humana", "name": "Desvinculación y entrevista de salida.", "priority": "Media", "status": "Por iniciar"}, {"id": 98, "area": "Gestión humana", "name": "Custodia de expedientes laborales.", "priority": "Media", "status": "Por iniciar"}, {"id": 99, "area": "Gestión humana", "name": "Protocolo e inducción de personal de nuevo ingreso", "priority": "Alta", "status": "Finalizado"}, {"id": 100, "area": "Gestión humana", "name": "Confidencialidad de información del trabajador.", "priority": "Baja", "status": "Por iniciar"}, {"id": 101, "area": "Seguridad", "name": "Control de acceso de empleados, clientes y visitantes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 102, "area": "Seguridad", "name": "Registro de visitantes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 103, "area": "Seguridad", "name": "Control de llaves y vehículos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 104, "area": "Seguridad", "name": "Apertura y cierre de instalaciones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 105, "area": "Seguridad", "name": "Gestión de CCTV.", "priority": "Baja", "status": "Por iniciar"}, {"id": 106, "area": "Seguridad", "name": "Manejo de incidentes y robos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 107, "area": "Seguridad", "name": "Evacuación y emergencias.", "priority": "Baja", "status": "Por iniciar"}, {"id": 108, "area": "Seguridad", "name": "Control de ingreso y salida de vehículos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 109, "area": "Seguridad", "name": "Gestión de objetos perdidos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 110, "area": "Seguridad", "name": "Reporte e investigación de incidentes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 111, "area": "Servicios generales", "name": "Limpieza y desinfección.", "priority": "Media", "status": "Por iniciar"}, {"id": 112, "area": "Servicios generales", "name": "Mantenimiento preventivo de instalaciones.", "priority": "Media", "status": "Por iniciar"}, {"id": 113, "area": "Servicios generales", "name": "Mantenimiento de equipos.", "priority": "Media", "status": "Por iniciar"}, {"id": 114, "area": "Servicios generales", "name": "Gestión de proveedores de servicios.", "priority": "Media", "status": "Por iniciar"}, {"id": 115, "area": "Servicios generales", "name": "Control de consumos de agua y electricidad", "priority": "Media", "status": "Por iniciar"}, {"id": 116, "area": "Servicios generales", "name": "Gestión de residuos.", "priority": "Media", "status": "Por iniciar"}, {"id": 117, "area": "Servicios generales", "name": "Control de plagas.", "priority": "Media", "status": "Por iniciar"}, {"id": 118, "area": "Servicios generales", "name": "Mantenimiento de extintores y sistemas contra incendio.", "priority": "Media", "status": "Por iniciar"}, {"id": 119, "area": "Servicios generales", "name": "Inspecciones de condiciones inseguras.", "priority": "Alta", "status": "Por iniciar"}];
+    let currentData = [...rawProcedures];
+    let sortColumn = 'area';
+    let sortAsc = true;
+    let chartInstanceEstatus = null;
+    let chartInstancePrioridad = null;
+    let chartInstanceCronograma = null;
+    let chartInstanceAreas = null;
+
+    const STORAGE_KEY = 'SHEETS_CSV_SYNC_URL';
+
+    function initFilters() {
+      const areas = [...new Set(rawProcedures.map(p => p.area))].sort();
+      const select = document.getElementById('areaFilter');
+      const cur = select.value;
+      select.innerHTML = '<option value="all">Todas las Áreas</option>';
+      areas.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = a;
+        select.appendChild(opt);
+      });
+      if (areas.includes(cur)) select.value = cur;
+    }
+
+    function switchTab(tabId) {
+      ['tab-overview', 'tab-table', 'tab-roadmap'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      ['nav-overview', 'nav-table', 'nav-roadmap'].forEach(id => {
+        const btn = document.getElementById(id);
+        btn.classList.remove('border-sky-400', 'text-sky-400');
+        btn.classList.add('border-transparent', 'text-slate-400');
+      });
+
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeNav = tabId === 'tab-overview' ? 'nav-overview' : (tabId === 'tab-table' ? 'nav-table' : 'nav-roadmap');
+      const navBtn = document.getElementById(activeNav);
+      navBtn.classList.add('border-sky-400', 'text-sky-400');
+      navBtn.classList.remove('border-transparent', 'text-slate-400');
+    }
+
+    function filterByQuick(type, element) {
+      document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('kpi-active'));
+      if (element) element.classList.add('kpi-active');
+
+      resetFiltersUI();
+
+      if (type === 'finalizado') {
+        document.getElementById('statusFilter').value = 'Finalizado';
+      } else if (type === 'en proceso') {
+        document.getElementById('statusFilter').value = 'En proceso';
+      } else if (type === 'por iniciar') {
+        document.getElementById('statusFilter').value = 'Por iniciar';
+      } else if (type === 'alta') {
+        document.getElementById('priorityFilter').value = 'Alta';
+      } else if (type === 'media') {
+        document.getElementById('priorityFilter').value = 'Media';
+      } else if (type === 'baja') {
+        document.getElementById('priorityFilter').value = 'Baja';
+      }
+
+      switchTab('tab-table');
+      renderTable();
+    }
+
+    function resetFiltersUI() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('areaFilter').value = 'all';
+      document.getElementById('priorityFilter').value = 'all';
+      document.getElementById('statusFilter').value = 'all';
+    }
+
+    function resetFilters() {
+      resetFiltersUI();
+      document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('kpi-active'));
+      document.getElementById('kpi-all').classList.add('kpi-active');
+      renderTable();
+    }
+
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const area = document.getElementById('areaFilter').value;
+      const priority = document.getElementById('priorityFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      currentData = rawProcedures.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(search) || item.area.toLowerCase().includes(search);
+        const matchesArea = area === 'all' || item.area === area;
+        const matchesPriority = priority === 'all' || item.priority.toLowerCase() === priority.toLowerCase();
+        const matchesStatus = status === 'all' || item.status.toLowerCase() === status.toLowerCase();
+        return matchesSearch && matchesArea && matchesPriority && matchesStatus;
+      });
+
+      currentData.sort((a, b) => {
+        let valA = a[sortColumn];
+        let valB = b[sortColumn];
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        if (valA < valB) return sortAsc ? -1 : 1;
+        if (valA > valB) return sortAsc ? 1 : -1;
+        return 0;
+      });
+
+      document.getElementById('filteredCount').textContent = currentData.length;
+      document.getElementById('tabCountBadge').textContent = currentData.length;
+
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      if (currentData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500 text-xs">No se encontraron procedimientos coincidentes con los filtros seleccionados.</td></tr>`;
+        return;
+      }
+
+      currentData.forEach((proc, index) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 transition duration-150";
+
+        let pBadge = '';
+        if (proc.priority.toLowerCase() === 'alta') {
+          pBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">Alta</span>`;
+        } else if (proc.priority.toLowerCase() === 'media') {
+          pBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">Media</span>`;
+        } else {
+          pBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">Baja</span>`;
+        }
+
+        let sBadge = '';
+        if (proc.status.toLowerCase().includes('finalizado')) {
+          sBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 justify-center"><i class="fa-solid fa-check"></i> Finalizado</span>`;
+        } else if (proc.status.toLowerCase().includes('proceso')) {
+          sBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1 justify-center"><i class="fa-solid fa-clock"></i> En proceso</span>`;
+        } else {
+          sBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700/60 flex items-center gap-1 justify-center">Por iniciar</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-center text-slate-400 font-mono text-[11px]">${index + 1}</td>
+          <td class="py-3 px-4 font-semibold text-slate-200">${proc.area}</td>
+          <td class="py-3 px-4 text-slate-300">${proc.name}</td>
+          <td class="py-3 px-4 text-center">${pBadge}</td>
+          <td class="py-3 px-4 text-center">${sBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function sortTable(column) {
+      if (sortColumn === column) {
+        sortAsc = !sortAsc;
+      } else {
+        sortColumn = column;
+        sortAsc = true;
+      }
+      renderTable();
+    }
+
+    function exportToCSV() {
+      let csv = "ID,Area,Procedimiento,Prioridad,Estatus\n";
+      rawProcedures.forEach(p => {
+        const safeName = `"${p.name.replace(/"/g, '""')}"`;
+        csv += `${p.id},"${p.area}",${safeName},"${p.priority}","${p.status}"\n`;
+      });
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "procedimientos_comite.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+
+    function renderCharts() {
+      Chart.defaults.color = '#94a3b8';
+      Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
+
+      const finCount = rawProcedures.filter(p => p.status.toLowerCase().includes('finalizado')).length;
+      const procCount = rawProcedures.filter(p => p.status.toLowerCase().includes('proceso')).length;
+      const pendCount = rawProcedures.filter(p => p.status.toLowerCase().includes('iniciar') || p.status.toLowerCase().includes('pendiente')).length;
+
+      // 1. Chart Estatus
+      if (chartInstanceEstatus) chartInstanceEstatus.destroy();
+      const ctxEstatus = document.getElementById('chartEstatus').getContext('2d');
+      chartInstanceEstatus = new Chart(ctxEstatus, {
+        type: 'doughnut',
+        data: {
+          labels: ['Finalizado (' + finCount + ')', 'En proceso (' + procCount + ')', 'Por iniciar (' + pendCount + ')'],
+          datasets: [{
+            data: [finCount, procCount, pendCount],
+            backgroundColor: ['#10b981', '#f59e0b', '#334155'],
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } }
+          },
+          cutout: '72%'
+        }
+      });
+
+      // 2. Chart Prioridad
+      const altaCount = rawProcedures.filter(p => p.priority.toLowerCase() === 'alta').length;
+      const mediaCount = rawProcedures.filter(p => p.priority.toLowerCase() === 'media').length;
+      const bajaCount = rawProcedures.filter(p => p.priority.toLowerCase() === 'baja').length;
+
+      if (chartInstancePrioridad) chartInstancePrioridad.destroy();
+      const ctxPrioridad = document.getElementById('chartPrioridad').getContext('2d');
+      chartInstancePrioridad = new Chart(ctxPrioridad, {
+        type: 'pie',
+        data: {
+          labels: ['Alta (' + altaCount + ')', 'Media (' + mediaCount + ')', 'Baja (' + bajaCount + ')'],
+          datasets: [{
+            data: [altaCount, mediaCount, bajaCount],
+            backgroundColor: ['#f43f5e', '#fbbf24', '#38bdf8'],
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } }
+          }
+        }
+      });
+
+      // 3. Chart Cronograma
+      if (chartInstanceCronograma) chartInstanceCronograma.destroy();
+      const ctxCronograma = document.getElementById('chartCronograma').getContext('2d');
+      chartInstanceCronograma = new Chart(ctxCronograma, {
+        type: 'bar',
+        data: {
+          labels: ['Octubre 2026', 'Noviembre 2026', 'Diciembre 2026', 'Enero 2027'],
+          datasets: [{
+            label: 'Procedimientos de Alta Prioridad',
+            data: [12, 12, 10, 5],
+            backgroundColor: ['#0284c7', '#f59e0b', '#a855f7', '#10b981'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.06)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 4. Chart Áreas
+      const areasList = [...new Set(rawProcedures.map(p => p.area))].sort();
+      const dataFin = [];
+      const dataProc = [];
+      const dataPend = [];
+
+      areasList.forEach(a => {
+        const inArea = rawProcedures.filter(p => p.area === a);
+        dataFin.push(inArea.filter(p => p.status.toLowerCase().includes('finalizado')).length);
+        dataProc.push(inArea.filter(p => p.status.toLowerCase().includes('proceso')).length);
+        dataPend.push(inArea.filter(p => p.status.toLowerCase().includes('iniciar') || p.status.toLowerCase().includes('pendiente')).length);
+      });
+
+      if (chartInstanceAreas) chartInstanceAreas.destroy();
+      const ctxAreas = document.getElementById('chartAreas').getContext('2d');
+      chartInstanceAreas = new Chart(ctxAreas, {
+        type: 'bar',
+        data: {
+          labels: areasList,
+          datasets: [
+            {
+              label: 'Finalizados',
+              data: dataFin,
+              backgroundColor: '#10b981',
+              borderRadius: 4
+            },
+            {
+              label: 'En Proceso',
+              data: dataProc,
+              backgroundColor: '#f59e0b',
+              borderRadius: 4
+            },
+            {
+              label: 'Por Iniciar',
+              data: dataPend,
+              backgroundColor: '#334155',
+              borderRadius: 4
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const selectedArea = areasList[index];
+              document.getElementById('areaFilter').value = selectedArea;
+              switchTab('tab-table');
+              renderTable();
+            }
+          },
+          scales: {
+            x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { stacked: true, grid: { display: false } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function openConfigModal() {
+      const saved = localStorage.getItem(STORAGE_KEY) || '';
+      document.getElementById('sheetsCsvUrlInput').value = saved;
+      document.getElementById('configModal').classList.remove('hidden');
+    }
+
+    function closeConfigModal() {
+      document.getElementById('configModal').classList.add('hidden');
+    }
+
+    function saveAndSync() {
+      const val = document.getElementById('sheetsCsvUrlInput').value.trim();
+      if (val) {
+        localStorage.setItem(STORAGE_KEY, val);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+      closeConfigModal();
+      syncGoogleSheets();
+    }
+
+    function syncGoogleSheets() {
+      const url = localStorage.getItem(STORAGE_KEY);
+      const icon = document.getElementById('syncIcon');
+      const text = document.getElementById('syncText');
+      if (icon) icon.classList.add('fa-spin');
+      if (text) text.textContent = 'Cargando...';
+
+      if (!url) {
+        if (icon) icon.classList.remove('fa-spin');
+        if (text) text.textContent = 'Sincronizar Sheets';
+        openConfigModal();
+        return;
+      }
+
+      const cacheBusterUrl = url.includes('?') ? (url + '&_t=' + new Date().getTime()) : (url + '?_t=' + new Date().getTime());
+
+      Papa.parse(cacheBusterUrl, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          if (icon) icon.classList.remove('fa-spin');
+          if (text) text.textContent = 'Sincronizado';
+          setTimeout(() => { if (text) text.textContent = 'Sincronizar Sheets'; }, 3000);
+          
+          if (results.data && results.data.length > 0) {
+            const parsed = [];
+            results.data.forEach((row, idx) => {
+              const keys = Object.keys(row);
+              const areaKey = keys.find(k => k.toLowerCase().includes('rea')) || keys[0];
+              const nameKey = keys.find(k => k.toLowerCase().includes('procedimiento') || k.toLowerCase().includes('nombre')) || keys[1];
+              const prioKey = keys.find(k => k.toLowerCase().includes('prioridad')) || keys[2];
+              const statusKey = keys.find(k => k.toLowerCase().includes('estatus') || k.toLowerCase().includes('estado')) || keys[3];
+
+              const areaVal = row[areaKey]?.trim();
+              const nameVal = row[nameKey]?.trim();
+
+              if (areaVal && nameVal) {
+                parsed.push({
+                  id: idx + 1,
+                  area: areaVal,
+                  name: nameVal,
+                  priority: row[prioKey]?.trim() || 'Media',
+                  status: row[statusKey]?.trim() || 'Por iniciar'
+                });
+              }
+            });
+
+            if (parsed.length > 0) {
+              rawProcedures.length = 0;
+              parsed.forEach(p => rawProcedures.push(p));
+              initFilters();
+              renderTable();
+              renderCharts();
+              document.getElementById('syncTimestamp').textContent = 'Actualizado: ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+          }
+        },
+        error: function(err) {
+          if (icon) icon.classList.remove('fa-spin');
+          if (text) text.textContent = 'Error';
+          console.error(err);
+          alert('No se pudo descargar la hoja. Verifica que el enlace tenga permisos públicos y formato CSV.');
+        }
+      });
+    }
+
+    window.onload = () => {
+      initFilters();
+      renderTable();
+      renderCharts();
+      if (localStorage.getItem(STORAGE_KEY)) {
+        syncGoogleSheets();
+      }
+    };
+  </script>
+</body>
+</html>
