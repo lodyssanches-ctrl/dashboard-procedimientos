@@ -134,11 +134,11 @@
           <i class="fa-solid fa-arrows-rotate text-amber-400 text-base"></i>
         </div>
         <div class="mt-3">
-          <span id="kpiProcVal" class="text-3xl sm:text-4xl font-extrabold text-amber-400 tracking-tight">3</span>
-          <span id="kpiProcPct" class="text-xs text-slate-400 block mt-0.5">2.5% en redacción</span>
+          <span id="kpiProcVal" class="text-3xl sm:text-4xl font-extrabold text-amber-400 tracking-tight">5</span>
+          <span id="kpiProcPct" class="text-xs text-slate-400 block mt-0.5"><b class="text-amber-400">4.2%</b> en redacción</span>
         </div>
         <div class="mt-3 text-[11px] font-medium text-amber-400 flex items-center gap-1">
-          <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver en curso
+          <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver en curso (5)
         </div>
       </div>
 
@@ -149,8 +149,8 @@
           <i class="fa-solid fa-clock text-slate-400 text-base"></i>
         </div>
         <div class="mt-3">
-          <span id="kpiPendVal" class="text-3xl sm:text-4xl font-extrabold text-slate-200 tracking-tight">108</span>
-          <span id="kpiPendPct" class="text-xs text-slate-400 block mt-0.5"><b class="text-slate-300">90.8%</b> pendiente</span>
+          <span id="kpiPendVal" class="text-3xl sm:text-4xl font-extrabold text-slate-200 tracking-tight">106</span>
+          <span id="kpiPendPct" class="text-xs text-slate-400 block mt-0.5"><b class="text-slate-300">89.1%</b> pendiente</span>
         </div>
         <div class="mt-3 text-[11px] font-medium text-slate-400 flex items-center gap-1">
           <i class="fa-solid fa-arrow-right text-[10px]"></i> Ver pendientes
@@ -210,11 +210,11 @@
             </div>
             <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('en proceso')">
               <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span>
-              <span class="text-slate-400">Curso:</span> <b id="lblCurso" class="text-amber-400">3</b>
+              <span class="text-slate-400">Curso:</span> <b id="lblCurso" class="text-amber-400">5</b>
             </div>
             <div class="cursor-pointer hover:bg-slate-800/40 p-1 rounded" onclick="filterByQuick('por iniciar')">
               <span class="inline-block w-2.5 h-2.5 rounded-full bg-slate-500 mr-1"></span>
-              <span class="text-slate-400">Pend:</span> <b id="lblPend" class="text-slate-300">108</b>
+              <span class="text-slate-400">Pend:</span> <b id="lblPend" class="text-slate-300">106</b>
             </div>
           </div>
         </div>
@@ -298,10 +298,10 @@
 
         <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-amber-500">
           <h4 class="text-sm font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Carga Administrativa Central
+            <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> En Proceso Activo (5)
           </h4>
           <p class="text-xs text-slate-300 mt-2 leading-relaxed">
-            <b>Gestión Humana (17), Finanzas (13) y Legal (12)</b> acumulan 42 de los 119 procedimientos (35.3%). Se recomienda coordinar sesiones de trabajo dedicadas para estas gerencias.
+            Actualmente se encuentran en elaboración técnica <b>5 procedimientos</b>: 3 en <b>Seguros</b> (Pólizas, Renovación y Siniestros) y 2 en <b>Comercial</b> (Seguimiento de prospectos y Clientes corporativos).
           </p>
         </div>
 
@@ -496,7 +496,7 @@
 
   <!-- LÓGICA DE CONTROL DEL TABLERO -->
   <script>
-    const rawProcedures = [{"id": 1, "area": "Dirección ejecutiva", "name": "Procedimiento de planificación estratégica.", "priority": "Media", "status": "Por iniciar"}, {"id": 2, "area": "Dirección ejecutiva", "name": "Procedimiento de aprobación del presupuesto anual.", "priority": "Alta", "status": "Por iniciar"}, {"id": 3, "area": "Dirección ejecutiva", "name": "Procedimiento de seguimiento de metas y resultados.", "priority": "Alta", "status": "Por iniciar"}, {"id": 4, "area": "Dirección ejecutiva", "name": "Procedimiento de reuniones gerenciales y seguimiento de acuerdos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 5, "area": "Dirección ejecutiva", "name": "Procedimiento de aprobación de inversiones y gastos extraordinarios.", "priority": "Baja", "status": "Por iniciar"}, {"id": 6, "area": "Dirección ejecutiva", "name": "Procedimiento de delegación de autoridad.", "priority": "Media", "status": "Por iniciar"}, {"id": 7, "area": "Dirección ejecutiva", "name": "Procedimiento de gestión de crisis y toma de decisiones urgentes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 8, "area": "Tesorería", "name": "Elaboración y aprobación del presupuesto.", "priority": "Baja", "status": "Por iniciar"}, {"id": 9, "area": "Tesorería", "name": "Control presupuestario mensual.", "priority": "Baja", "status": "Por iniciar"}, {"id": 10, "area": "Tesorería", "name": "Pronóstico de flujo de caja.", "priority": "Media", "status": "Por iniciar"}, {"id": 11, "area": "Tesorería", "name": "Administración de cuentas por cobrar y por pagar.", "priority": "Media", "status": "Por iniciar"}, {"id": 12, "area": "Tesorería", "name": "Análisis de rentabilidad por vehículo, modelo, vendedor, taller y servicio.", "priority": "Media", "status": "Por iniciar"}, {"id": 13, "area": "Tesorería", "name": "Cierre financiero mensual.", "priority": "Alta", "status": "Por iniciar"}, {"id": 14, "area": "Tesorería", "name": "Recepción y validación de pagos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 15, "area": "Finanzas", "name": "Conciliaciones bancarias.", "priority": "Alta", "status": "Por iniciar"}, {"id": 16, "area": "Finanzas", "name": "Programación y autorización de pagos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 17, "area": "Finanzas", "name": "Administración de fondos fijos y cajas chicas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 18, "area": "Finanzas", "name": "Anulación y reverso de transacciones.", "priority": "Media", "status": "Por iniciar"}, {"id": 19, "area": "Finanzas", "name": "Registro de ingresos por venta de vehículos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 20, "area": "Finanzas", "name": "Registro de costos de vehículos vendidos.", "priority": "Media", "status": "Por iniciar"}, {"id": 21, "area": "Finanzas", "name": "Cuentas por cobrar y provisiones.", "priority": "Alta", "status": "Por iniciar"}, {"id": 22, "area": "Finanzas", "name": "Cuentas por pagar y recepción de facturas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 23, "area": "Finanzas", "name": "Activos fijos y depreciaciones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 24, "area": "Finanzas", "name": "Inventarios y ajustes contables.", "priority": "Media", "status": "Por iniciar"}, {"id": 25, "area": "Finanzas", "name": "Impuestos y obligaciones fiscales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 26, "area": "Finanzas", "name": "Cierre contable y archivo de soportes.", "priority": "Media", "status": "Por iniciar"}, {"id": 27, "area": "Finanzas", "name": "Debida diligencia de clientes, proveedores y terceros.", "priority": "Media", "status": "Por iniciar"}, {"id": 28, "area": "Cumplimiento", "name": "Monitoreo y reporte de operaciones inusuales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 29, "area": "Cumplimiento", "name": "Capacitación en cumplimiento.", "priority": "Baja", "status": "Por iniciar"}, {"id": 30, "area": "Cumplimiento", "name": "Conservación de expedientes y evidencias.", "priority": "Baja", "status": "Por iniciar"}, {"id": 31, "area": "Cumplimiento", "name": "Emisión de finiquito", "priority": "Alta", "status": "Finalizado"}, {"id": 32, "area": "Cumplimiento", "name": "Seguimiento de cambios normativos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 33, "area": "Legal", "name": "Constitución, poderes y representación legal.", "priority": "Alta", "status": "Por iniciar"}, {"id": 34, "area": "Legal", "name": "Revisión y aprobación de contratos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 35, "area": "Legal", "name": "Contratos de compraventa de vehículos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 36, "area": "Legal", "name": "Contratos de financiamiento, seguros y servicios adicionales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 37, "area": "Legal", "name": "Términos y condiciones de promociones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 38, "area": "Legal", "name": "Gestión de reclamos y demandas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 39, "area": "Legal", "name": "Protección de datos personales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 40, "area": "Legal", "name": "Revisión de publicidad y comunicaciones comerciales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 41, "area": "Legal", "name": "Permisos, licencias y registros regulatorios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 42, "area": "Legal", "name": "Atención de requerimientos de autoridades.", "priority": "Alta", "status": "Por iniciar"}, {"id": 43, "area": "Legal", "name": "Gestión de garantías legales y derechos del consumidor.", "priority": "Alta", "status": "Por iniciar"}, {"id": 44, "area": "Legal", "name": "Control de vencimientos contractuales y regulatorios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 45, "area": "Procura e inventario", "name": "Plan anual de compras.", "priority": "Media", "status": "Por iniciar"}, {"id": 46, "area": "Procura e inventario", "name": "Solicitud interna de compra.", "priority": "Baja", "status": "Por iniciar"}, {"id": 47, "area": "Procura e inventario", "name": "Evaluación, homologación y aprobación de proveedores.", "priority": "Baja", "status": "Por iniciar"}, {"id": 48, "area": "Procura e inventario", "name": "Emisión y aprobación de órdenes de compra.", "priority": "Baja", "status": "Por iniciar"}, {"id": 49, "area": "Procura e inventario", "name": "Compras urgentes.", "priority": "Media", "status": "Por iniciar"}, {"id": 50, "area": "Procura e inventario", "name": "Inventarios cíclicos y físicos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 51, "area": "Procura e inventario", "name": "Devolución a proveedores.", "priority": "Baja", "status": "Por iniciar"}, {"id": 52, "area": "Procura e inventario", "name": "Disposición de bienes obsoletos o dañados.", "priority": "Baja", "status": "Por iniciar"}, {"id": 53, "area": "Comercial", "name": "Ventas Rnlt/VAS", "priority": "Alta", "status": "Finalizado"}, {"id": 54, "area": "Comercial", "name": "Ventas Ducati", "priority": "Alta", "status": "Por iniciar"}, {"id": 55, "area": "Comercial", "name": "Seguimiento de prospectos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 56, "area": "Comercial", "name": "Tratamiento de clientes corporativos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 57, "area": "Comercial", "name": "Aprobación de descuentos especiales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 58, "area": "Comercial", "name": "Manejo de ventas canceladas", "priority": "Alta", "status": "Por iniciar"}, {"id": 59, "area": "Administración", "name": "Facturación", "priority": "Alta", "status": "Finalizado"}, {"id": 60, "area": "Administración", "name": "Notas de crédito y débito", "priority": "Baja", "status": "Por iniciar"}, {"id": 61, "area": "Administración", "name": "Anulaciones", "priority": "Baja", "status": "Por iniciar"}, {"id": 62, "area": "Administración", "name": "Solicitud de pedidos al importador", "priority": "Alta", "status": "Finalizado"}, {"id": 63, "area": "Cobranzas", "name": "Coordinación con Legal para recuperación judicial", "priority": "Alta", "status": "Finalizado"}, {"id": 64, "area": "Cobranzas", "name": "Cobranzas", "priority": "Alta", "status": "Finalizado"}, {"id": 65, "area": "Operaciones", "name": "Inspección de daños", "priority": "Baja", "status": "Por iniciar"}, {"id": 66, "area": "Operaciones", "name": "Reporte de faltantes o daños al fabricante o transportista", "priority": "Media", "status": "Por iniciar"}, {"id": 67, "area": "Operaciones", "name": "Acondicionamiento de vehiculos para entrega", "priority": "Alta", "status": "Por iniciar"}, {"id": 68, "area": "Operaciones", "name": "Actualización del sistema de inventario", "priority": "Media", "status": "Por iniciar"}, {"id": 69, "area": "Operaciones", "name": "Control de vehículos de cortesía", "priority": "Media", "status": "Por iniciar"}, {"id": 70, "area": "Operaciones", "name": "Inventario físico periódico", "priority": "Media", "status": "Por iniciar"}, {"id": 71, "area": "Posventa", "name": "Programacion de citas y recepción de vehículos para mantenimiento", "priority": "Alta", "status": "Finalizado"}, {"id": 72, "area": "Posventa", "name": "Gestión de garantías", "priority": "Alta", "status": "Por iniciar"}, {"id": 73, "area": "Posventa", "name": "Encuesta de satisfacción", "priority": "Baja", "status": "Por iniciar"}, {"id": 74, "area": "Posventa", "name": "Analisis de reclamos", "priority": "Baja", "status": "Por iniciar"}, {"id": 75, "area": "Seguros", "name": "Emisión y entrega de polizas", "priority": "Alta", "status": "En proceso"}, {"id": 76, "area": "Seguros", "name": "Conciliación de primas cobradas", "priority": "Alta", "status": "Por iniciar"}, {"id": 77, "area": "Seguros", "name": "Gestión de renovación", "priority": "Alta", "status": "En proceso"}, {"id": 78, "area": "Seguros", "name": "Reporte, inspección y resolución de siniestros", "priority": "Alta", "status": "En proceso"}, {"id": 79, "area": "Mercadeo", "name": "Control de presupuesto", "priority": "Alta", "status": "Por iniciar"}, {"id": 80, "area": "Mercadeo", "name": "Gestión de eventos y lanzamientos.", "priority": "Media", "status": "Por iniciar"}, {"id": 81, "area": "Mercadeo", "name": "Gestión de redes sociales", "priority": "Baja", "status": "Por iniciar"}, {"id": 82, "area": "Mercadeo", "name": "Captación y registro de leads", "priority": "Media", "status": "Por iniciar"}, {"id": 83, "area": "Mercadeo", "name": "Recepción de consultas y reclamos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 84, "area": "Gestión humana", "name": "Reclutamiento y selección.", "priority": "Alta", "status": "Por iniciar"}, {"id": 85, "area": "Gestión humana", "name": "Verificación de referencias.", "priority": "Alta", "status": "Por iniciar"}, {"id": 86, "area": "Gestión humana", "name": "Contratación e ingreso.", "priority": "Alta", "status": "Por iniciar"}, {"id": 87, "area": "Gestión humana", "name": "Inducción general y específica por cargo.", "priority": "Baja", "status": "Por iniciar"}, {"id": 88, "area": "Gestión humana", "name": "Capacitación técnica, comercial y de cumplimiento.", "priority": "Baja", "status": "Por iniciar"}, {"id": 89, "area": "Gestión humana", "name": "Evaluación de desempeño.", "priority": "Baja", "status": "Por iniciar"}, {"id": 90, "area": "Gestión humana", "name": "Planes de carrera y sucesión.", "priority": "Baja", "status": "Por iniciar"}, {"id": 91, "area": "Gestión humana", "name": "Gestión de vacaciones y ausencias.", "priority": "Media", "status": "Por iniciar"}, {"id": 92, "area": "Gestión humana", "name": "Control de asistencia.", "priority": "Baja", "status": "Por iniciar"}, {"id": 93, "area": "Gestión humana", "name": "Nómina y beneficios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 94, "area": "Gestión humana", "name": "Gestión disciplinaria.", "priority": "Media", "status": "Por iniciar"}, {"id": 95, "area": "Gestión humana", "name": "Seguridad y salud laboral.", "priority": "Media", "status": "Por iniciar"}, {"id": 96, "area": "Gestión humana", "name": "Entrega y devolución de activos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 97, "area": "Gestión humana", "name": "Desvinculación y entrevista de salida.", "priority": "Media", "status": "Por iniciar"}, {"id": 98, "area": "Gestión humana", "name": "Custodia de expedientes laborales.", "priority": "Media", "status": "Por iniciar"}, {"id": 99, "area": "Gestión humana", "name": "Protocolo e inducción de personal de nuevo ingreso", "priority": "Alta", "status": "Finalizado"}, {"id": 100, "area": "Gestión humana", "name": "Confidencialidad de información del trabajador.", "priority": "Baja", "status": "Por iniciar"}, {"id": 101, "area": "Seguridad", "name": "Control de acceso de empleados, clientes y visitantes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 102, "area": "Seguridad", "name": "Registro de visitantes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 103, "area": "Seguridad", "name": "Control de llaves y vehículos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 104, "area": "Seguridad", "name": "Apertura y cierre de instalaciones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 105, "area": "Seguridad", "name": "Gestión de CCTV.", "priority": "Baja", "status": "Por iniciar"}, {"id": 106, "area": "Seguridad", "name": "Manejo de incidentes y robos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 107, "area": "Seguridad", "name": "Evacuación y emergencias.", "priority": "Baja", "status": "Por iniciar"}, {"id": 108, "area": "Seguridad", "name": "Control de ingreso y salida de vehículos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 109, "area": "Seguridad", "name": "Gestión de objetos perdidos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 110, "area": "Seguridad", "name": "Reporte e investigación de incidentes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 111, "area": "Servicios generales", "name": "Limpieza y desinfección.", "priority": "Media", "status": "Por iniciar"}, {"id": 112, "area": "Servicios generales", "name": "Mantenimiento preventivo de instalaciones.", "priority": "Media", "status": "Por iniciar"}, {"id": 113, "area": "Servicios generales", "name": "Mantenimiento de equipos.", "priority": "Media", "status": "Por iniciar"}, {"id": 114, "area": "Servicios generales", "name": "Gestión de proveedores de servicios.", "priority": "Media", "status": "Por iniciar"}, {"id": 115, "area": "Servicios generales", "name": "Control de consumos de agua y electricidad", "priority": "Media", "status": "Por iniciar"}, {"id": 116, "area": "Servicios generales", "name": "Gestión de residuos.", "priority": "Media", "status": "Por iniciar"}, {"id": 117, "area": "Servicios generales", "name": "Control de plagas.", "priority": "Media", "status": "Por iniciar"}, {"id": 118, "area": "Servicios generales", "name": "Mantenimiento de extintores y sistemas contra incendio.", "priority": "Media", "status": "Por iniciar"}, {"id": 119, "area": "Servicios generales", "name": "Inspecciones de condiciones inseguras.", "priority": "Alta", "status": "Por iniciar"}];
+    const rawProcedures = [{"id": 1, "area": "Dirección ejecutiva", "name": "Procedimiento de planificación estratégica.", "priority": "Media", "status": "Por iniciar"}, {"id": 2, "area": "Dirección ejecutiva", "name": "Procedimiento de aprobación del presupuesto anual.", "priority": "Alta", "status": "Por iniciar"}, {"id": 3, "area": "Dirección ejecutiva", "name": "Procedimiento de seguimiento de metas y resultados.", "priority": "Alta", "status": "Por iniciar"}, {"id": 4, "area": "Dirección ejecutiva", "name": "Procedimiento de reuniones gerenciales y seguimiento de acuerdos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 5, "area": "Dirección ejecutiva", "name": "Procedimiento de aprobación de inversiones y gastos extraordinarios.", "priority": "Baja", "status": "Por iniciar"}, {"id": 6, "area": "Dirección ejecutiva", "name": "Procedimiento de delegación de autoridad.", "priority": "Media", "status": "Por iniciar"}, {"id": 7, "area": "Dirección ejecutiva", "name": "Procedimiento de gestión de crisis y toma de decisiones urgentes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 8, "area": "Tesorería", "name": "Elaboración y aprobación del presupuesto.", "priority": "Baja", "status": "Por iniciar"}, {"id": 9, "area": "Tesorería", "name": "Control presupuestario mensual.", "priority": "Baja", "status": "Por iniciar"}, {"id": 10, "area": "Tesorería", "name": "Pronóstico de flujo de caja.", "priority": "Media", "status": "Por iniciar"}, {"id": 11, "area": "Tesorería", "name": "Administración de cuentas por cobrar y por pagar.", "priority": "Media", "status": "Por iniciar"}, {"id": 12, "area": "Tesorería", "name": "Análisis de rentabilidad por vehículo, modelo, vendedor, taller y servicio.", "priority": "Media", "status": "Por iniciar"}, {"id": 13, "area": "Tesorería", "name": "Cierre financiero mensual.", "priority": "Alta", "status": "Por iniciar"}, {"id": 14, "area": "Tesorería", "name": "Recepción y validación de pagos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 15, "area": "Finanzas", "name": "Conciliaciones bancarias.", "priority": "Alta", "status": "Por iniciar"}, {"id": 16, "area": "Finanzas", "name": "Programación y autorización de pagos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 17, "area": "Finanzas", "name": "Administración de fondos fijos y cajas chicas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 18, "area": "Finanzas", "name": "Anulación y reverso de transacciones.", "priority": "Media", "status": "Por iniciar"}, {"id": 19, "area": "Finanzas", "name": "Registro de ingresos por venta de vehículos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 20, "area": "Finanzas", "name": "Registro de costos de vehículos vendidos.", "priority": "Media", "status": "Por iniciar"}, {"id": 21, "area": "Finanzas", "name": "Cuentas por cobrar y provisiones.", "priority": "Alta", "status": "Por iniciar"}, {"id": 22, "area": "Finanzas", "name": "Cuentas por pagar y recepción de facturas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 23, "area": "Finanzas", "name": "Activos fijos y depreciaciones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 24, "area": "Finanzas", "name": "Inventarios y ajustes contables.", "priority": "Media", "status": "Por iniciar"}, {"id": 25, "area": "Finanzas", "name": "Impuestos y obligaciones fiscales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 26, "area": "Finanzas", "name": "Cierre contable y archivo de soportes.", "priority": "Media", "status": "Por iniciar"}, {"id": 27, "area": "Finanzas", "name": "Debida diligencia de clientes, proveedores y terceros.", "priority": "Media", "status": "Por iniciar"}, {"id": 28, "area": "Cumplimiento", "name": "Monitoreo y reporte de operaciones inusuales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 29, "area": "Cumplimiento", "name": "Capacitación en cumplimiento.", "priority": "Baja", "status": "Por iniciar"}, {"id": 30, "area": "Cumplimiento", "name": "Conservación de expedientes y evidencias.", "priority": "Baja", "status": "Por iniciar"}, {"id": 31, "area": "Cumplimiento", "name": "Emisión de finiquito", "priority": "Alta", "status": "Finalizado"}, {"id": 32, "area": "Cumplimiento", "name": "Seguimiento de cambios normativos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 33, "area": "Legal", "name": "Constitución, poderes y representación legal.", "priority": "Alta", "status": "Por iniciar"}, {"id": 34, "area": "Legal", "name": "Revisión y aprobación de contratos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 35, "area": "Legal", "name": "Contratos de compraventa de vehículos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 36, "area": "Legal", "name": "Contratos de financiamiento, seguros y servicios adicionales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 37, "area": "Legal", "name": "Términos y condiciones de promociones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 38, "area": "Legal", "name": "Gestión de reclamos y demandas.", "priority": "Alta", "status": "Por iniciar"}, {"id": 39, "area": "Legal", "name": "Protección de datos personales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 40, "area": "Legal", "name": "Revisión de publicidad y comunicaciones comerciales.", "priority": "Baja", "status": "Por iniciar"}, {"id": 41, "area": "Legal", "name": "Permisos, licencias y registros regulatorios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 42, "area": "Legal", "name": "Atención de requerimientos de autoridades.", "priority": "Alta", "status": "Por iniciar"}, {"id": 43, "area": "Legal", "name": "Gestión de garantías legales y derechos del consumidor.", "priority": "Alta", "status": "Por iniciar"}, {"id": 44, "area": "Legal", "name": "Control de vencimientos contractuales y regulatorios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 45, "area": "Procura e inventario", "name": "Plan anual de compras.", "priority": "Media", "status": "Por iniciar"}, {"id": 46, "area": "Procura e inventario", "name": "Solicitud interna de compra.", "priority": "Baja", "status": "Por iniciar"}, {"id": 47, "area": "Procura e inventario", "name": "Evaluación, homologación y aprobación de proveedores.", "priority": "Baja", "status": "Por iniciar"}, {"id": 48, "area": "Procura e inventario", "name": "Emisión y aprobación de órdenes de compra.", "priority": "Baja", "status": "Por iniciar"}, {"id": 49, "area": "Procura e inventario", "name": "Compras urgentes.", "priority": "Media", "status": "Por iniciar"}, {"id": 50, "area": "Procura e inventario", "name": "Inventarios cíclicos y físicos.", "priority": "Alta", "status": "Por iniciar"}, {"id": 51, "area": "Procura e inventario", "name": "Devolución a proveedores.", "priority": "Baja", "status": "Por iniciar"}, {"id": 52, "area": "Procura e inventario", "name": "Disposición de bienes obsoletos o dañados.", "priority": "Baja", "status": "Por iniciar"}, {"id": 53, "area": "Comercial", "name": "Ventas Rnlt/VAS", "priority": "Alta", "status": "Finalizado"}, {"id": 54, "area": "Comercial", "name": "Ventas Ducati", "priority": "Alta", "status": "Por iniciar"}, {"id": 55, "area": "Comercial", "name": "Seguimiento de prospectos.", "priority": "Alta", "status": "En proceso"}, {"id": 56, "area": "Comercial", "name": "Tratamiento de clientes corporativos.", "priority": "Alta", "status": "En proceso"}, {"id": 57, "area": "Comercial", "name": "Aprobación de descuentos especiales.", "priority": "Alta", "status": "Por iniciar"}, {"id": 58, "area": "Comercial", "name": "Manejo de ventas canceladas", "priority": "Alta", "status": "Por iniciar"}, {"id": 59, "area": "Administración", "name": "Facturación", "priority": "Alta", "status": "Finalizado"}, {"id": 60, "area": "Administración", "name": "Notas de crédito y débito", "priority": "Baja", "status": "Por iniciar"}, {"id": 61, "area": "Administración", "name": "Anulaciones", "priority": "Baja", "status": "Por iniciar"}, {"id": 62, "area": "Administración", "name": "Solicitud de pedidos al importador", "priority": "Alta", "status": "Finalizado"}, {"id": 63, "area": "Cobranzas", "name": "Coordinación con Legal para recuperación judicial", "priority": "Alta", "status": "Finalizado"}, {"id": 64, "area": "Cobranzas", "name": "Cobranzas", "priority": "Alta", "status": "Finalizado"}, {"id": 65, "area": "Operaciones", "name": "Inspección de daños", "priority": "Baja", "status": "Por iniciar"}, {"id": 66, "area": "Operaciones", "name": "Reporte de faltantes o daños al fabricante o transportista", "priority": "Media", "status": "Por iniciar"}, {"id": 67, "area": "Operaciones", "name": "Acondicionamiento de vehiculos para entrega", "priority": "Alta", "status": "Por iniciar"}, {"id": 68, "area": "Operaciones", "name": "Actualización del sistema de inventario", "priority": "Media", "status": "Por iniciar"}, {"id": 69, "area": "Operaciones", "name": "Control de vehículos de cortesía", "priority": "Media", "status": "Por iniciar"}, {"id": 70, "area": "Operaciones", "name": "Inventario físico periódico", "priority": "Media", "status": "Por iniciar"}, {"id": 71, "area": "Posventa", "name": "Programacion de citas y recepción de vehículos para mantenimiento", "priority": "Alta", "status": "Finalizado"}, {"id": 72, "area": "Posventa", "name": "Gestión de garantías", "priority": "Alta", "status": "Por iniciar"}, {"id": 73, "area": "Posventa", "name": "Encuesta de satisfacción", "priority": "Baja", "status": "Por iniciar"}, {"id": 74, "area": "Posventa", "name": "Analisis de reclamos", "priority": "Baja", "status": "Por iniciar"}, {"id": 75, "area": "Seguros", "name": "Emisión y entrega de polizas", "priority": "Alta", "status": "En proceso"}, {"id": 76, "area": "Seguros", "name": "Conciliación de primas cobradas", "priority": "Alta", "status": "Por iniciar"}, {"id": 77, "area": "Seguros", "name": "Gestión de renovación", "priority": "Alta", "status": "En proceso"}, {"id": 78, "area": "Seguros", "name": "Reporte, inspección y resolución de siniestros", "priority": "Alta", "status": "En proceso"}, {"id": 79, "area": "Mercadeo", "name": "Control de presupuesto", "priority": "Alta", "status": "Por iniciar"}, {"id": 80, "area": "Mercadeo", "name": "Gestión de eventos y lanzamientos.", "priority": "Media", "status": "Por iniciar"}, {"id": 81, "area": "Mercadeo", "name": "Gestión de redes sociales", "priority": "Baja", "status": "Por iniciar"}, {"id": 82, "area": "Mercadeo", "name": "Captación y registro de leads", "priority": "Media", "status": "Por iniciar"}, {"id": 83, "area": "Mercadeo", "name": "Recepción de consultas y reclamos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 84, "area": "Gestión humana", "name": "Reclutamiento y selección.", "priority": "Alta", "status": "Por iniciar"}, {"id": 85, "area": "Gestión humana", "name": "Verificación de referencias.", "priority": "Alta", "status": "Por iniciar"}, {"id": 86, "area": "Gestión humana", "name": "Contratación e ingreso.", "priority": "Alta", "status": "Por iniciar"}, {"id": 87, "area": "Gestión humana", "name": "Inducción general y específica por cargo.", "priority": "Baja", "status": "Por iniciar"}, {"id": 88, "area": "Gestión humana", "name": "Capacitación técnica, comercial y de cumplimiento.", "priority": "Baja", "status": "Por iniciar"}, {"id": 89, "area": "Gestión humana", "name": "Evaluación de desempeño.", "priority": "Baja", "status": "Por iniciar"}, {"id": 90, "area": "Gestión humana", "name": "Planes de carrera y sucesión.", "priority": "Baja", "status": "Por iniciar"}, {"id": 91, "area": "Gestión humana", "name": "Gestión de vacaciones y ausencias.", "priority": "Media", "status": "Por iniciar"}, {"id": 92, "area": "Gestión humana", "name": "Control de asistencia.", "priority": "Baja", "status": "Por iniciar"}, {"id": 93, "area": "Gestión humana", "name": "Nómina y beneficios.", "priority": "Alta", "status": "Por iniciar"}, {"id": 94, "area": "Gestión humana", "name": "Gestión disciplinaria.", "priority": "Media", "status": "Por iniciar"}, {"id": 95, "area": "Gestión humana", "name": "Seguridad y salud laboral.", "priority": "Media", "status": "Por iniciar"}, {"id": 96, "area": "Gestión humana", "name": "Entrega y devolución de activos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 97, "area": "Gestión humana", "name": "Desvinculación y entrevista de salida.", "priority": "Media", "status": "Por iniciar"}, {"id": 98, "area": "Gestión humana", "name": "Custodia de expedientes laborales.", "priority": "Media", "status": "Por iniciar"}, {"id": 99, "area": "Gestión humana", "name": "Protocolo e inducción de personal de nuevo ingreso", "priority": "Alta", "status": "Finalizado"}, {"id": 100, "area": "Gestión humana", "name": "Confidencialidad de información del trabajador.", "priority": "Baja", "status": "Por iniciar"}, {"id": 101, "area": "Seguridad", "name": "Control de acceso de empleados, clientes y visitantes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 102, "area": "Seguridad", "name": "Registro de visitantes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 103, "area": "Seguridad", "name": "Control de llaves y vehículos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 104, "area": "Seguridad", "name": "Apertura y cierre de instalaciones.", "priority": "Baja", "status": "Por iniciar"}, {"id": 105, "area": "Seguridad", "name": "Gestión de CCTV.", "priority": "Baja", "status": "Por iniciar"}, {"id": 106, "area": "Seguridad", "name": "Manejo de incidentes y robos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 107, "area": "Seguridad", "name": "Evacuación y emergencias.", "priority": "Baja", "status": "Por iniciar"}, {"id": 108, "area": "Seguridad", "name": "Control de ingreso y salida de vehículos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 109, "area": "Seguridad", "name": "Gestión de objetos perdidos.", "priority": "Baja", "status": "Por iniciar"}, {"id": 110, "area": "Seguridad", "name": "Reporte e investigación de incidentes.", "priority": "Baja", "status": "Por iniciar"}, {"id": 111, "area": "Servicios generales", "name": "Limpieza y desinfección.", "priority": "Media", "status": "Por iniciar"}, {"id": 112, "area": "Servicios generales", "name": "Mantenimiento preventivo de instalaciones.", "priority": "Media", "status": "Por iniciar"}, {"id": 113, "area": "Servicios generales", "name": "Mantenimiento de equipos.", "priority": "Media", "status": "Por iniciar"}, {"id": 114, "area": "Servicios generales", "name": "Gestión de proveedores de servicios.", "priority": "Media", "status": "Por iniciar"}, {"id": 115, "area": "Servicios generales", "name": "Control de consumos de agua y electricidad", "priority": "Media", "status": "Por iniciar"}, {"id": 116, "area": "Servicios generales", "name": "Gestión de residuos.", "priority": "Media", "status": "Por iniciar"}, {"id": 117, "area": "Servicios generales", "name": "Control de plagas.", "priority": "Media", "status": "Por iniciar"}, {"id": 118, "area": "Servicios generales", "name": "Mantenimiento de extintores y sistemas contra incendio.", "priority": "Media", "status": "Por iniciar"}, {"id": 119, "area": "Servicios generales", "name": "Inspecciones de condiciones inseguras.", "priority": "Alta", "status": "Por iniciar"}];
     let currentData = [...rawProcedures];
     let sortColumn = 'area';
     let sortAsc = true;
@@ -507,8 +507,85 @@
 
     const STORAGE_KEY = 'SHEETS_CSV_SYNC_URL';
 
+    function normalizeStatus(st) {
+      if (!st) return 'Por iniciar';
+      const s = st.toLowerCase().trim();
+      if (s.includes('fin')) return 'Finalizado';
+      if (s.includes('proc')) return 'En proceso';
+      return 'Por iniciar';
+    }
+
+    function normalizePriority(pr) {
+      if (!pr) return 'Media';
+      const p = pr.toLowerCase().trim();
+      if (p.includes('alt')) return 'Alta';
+      if (p.includes('baj')) return 'Baja';
+      return 'Media';
+    }
+
+    function updateKPIs() {
+      const total = rawProcedures.length;
+      if (total === 0) return;
+
+      const fin = rawProcedures.filter(p => normalizeStatus(p.status) === 'Finalizado').length;
+      const proc = rawProcedures.filter(p => normalizeStatus(p.status) === 'En proceso').length;
+      const pend = rawProcedures.filter(p => normalizeStatus(p.status) === 'Por iniciar').length;
+      const alta = rawProcedures.filter(p => normalizePriority(p.priority) === 'Alta').length;
+      const media = rawProcedures.filter(p => normalizePriority(p.priority) === 'Media').length;
+      const baja = rawProcedures.filter(p => normalizePriority(p.priority) === 'Baja').length;
+      const areasCount = new Set(rawProcedures.map(p => p.area.trim())).size;
+
+      // Update Top KPI Cards
+      const elTotal = document.getElementById('kpiTotalVal');
+      if (elTotal) elTotal.textContent = total;
+
+      const elAreas = document.getElementById('kpiAreasCount');
+      if (elAreas) elAreas.textContent = `${areasCount} Departamentos`;
+
+      const elFin = document.getElementById('kpiFinVal');
+      if (elFin) elFin.textContent = fin;
+      const elFinPct = document.getElementById('kpiFinPct');
+      if (elFinPct) elFinPct.innerHTML = `<b class="text-emerald-400">${((fin/total)*100).toFixed(1)}%</b> completado`;
+
+      const elProc = document.getElementById('kpiProcVal');
+      if (elProc) elProc.textContent = proc;
+      const elProcPct = document.getElementById('kpiProcPct');
+      if (elProcPct) elProcPct.innerHTML = `<b class="text-amber-400">${((proc/total)*100).toFixed(1)}%</b> en redacción`;
+
+      const elPend = document.getElementById('kpiPendVal');
+      if (elPend) elPend.textContent = pend;
+      const elPendPct = document.getElementById('kpiPendPct');
+      if (elPendPct) elPendPct.innerHTML = `<b class="text-slate-300">${((pend/total)*100).toFixed(1)}%</b> pendiente`;
+
+      const elAlta = document.getElementById('kpiAltaVal');
+      if (elAlta) elAlta.textContent = alta;
+      const elAltaPct = document.getElementById('kpiAltaPct');
+      if (elAltaPct) elAltaPct.innerHTML = `<b class="text-rose-400">${((alta/total)*100).toFixed(1)}%</b> Críticos`;
+
+      // Update Chart card footer labels
+      const elLblListo = document.getElementById('lblListo');
+      if (elLblListo) elLblListo.textContent = fin;
+      const elLblCurso = document.getElementById('lblCurso');
+      if (elLblCurso) elLblCurso.textContent = proc;
+      const elLblPend = document.getElementById('lblPend');
+      if (elLblPend) elLblPend.textContent = pend;
+
+      const elLblAlta = document.getElementById('lblAlta');
+      if (elLblAlta) elLblAlta.textContent = alta;
+      const elLblMedia = document.getElementById('lblMedia');
+      if (elLblMedia) elLblMedia.textContent = media;
+      const elLblBaja = document.getElementById('lblBaja');
+      if (elLblBaja) elLblBaja.textContent = baja;
+
+      // Update Badges
+      const elTabBadge = document.getElementById('tabCountBadge');
+      if (elTabBadge) elTabBadge.textContent = total;
+      const elFooterTotal = document.getElementById('totalCountFooter');
+      if (elFooterTotal) elFooterTotal.textContent = total;
+    }
+
     function initFilters() {
-      const areas = [...new Set(rawProcedures.map(p => p.area))].sort();
+      const areas = [...new Set(rawProcedures.map(p => p.area.trim()))].sort();
       const select = document.getElementById('areaFilter');
       const cur = select.value;
       select.innerHTML = '<option value="all">Todas las Áreas</option>';
@@ -577,31 +654,33 @@
     }
 
     function renderTable() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
       const area = document.getElementById('areaFilter').value;
       const priority = document.getElementById('priorityFilter').value;
       const status = document.getElementById('statusFilter').value;
 
       currentData = rawProcedures.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(search) || item.area.toLowerCase().includes(search);
-        const matchesArea = area === 'all' || item.area === area;
-        const matchesPriority = priority === 'all' || item.priority.toLowerCase() === priority.toLowerCase();
-        const matchesStatus = status === 'all' || item.status.toLowerCase() === status.toLowerCase();
+        const itemName = item.name ? item.name.toLowerCase() : '';
+        const itemArea = item.area ? item.area.toLowerCase() : '';
+        const matchesSearch = !search || itemName.includes(search) || itemArea.includes(search);
+        const matchesArea = area === 'all' || item.area.trim() === area.trim();
+        const matchesPriority = priority === 'all' || normalizePriority(item.priority) === priority;
+        const matchesStatus = status === 'all' || normalizeStatus(item.status) === status;
         return matchesSearch && matchesArea && matchesPriority && matchesStatus;
       });
 
       currentData.sort((a, b) => {
         let valA = a[sortColumn];
         let valB = b[sortColumn];
-        if (typeof valA === 'string') valA = valA.toLowerCase();
-        if (typeof valB === 'string') valB = valB.toLowerCase();
+        if (typeof valA === 'string') valA = valA.toLowerCase().trim();
+        if (typeof valB === 'string') valB = valB.toLowerCase().trim();
         if (valA < valB) return sortAsc ? -1 : 1;
         if (valA > valB) return sortAsc ? 1 : -1;
         return 0;
       });
 
       document.getElementById('filteredCount').textContent = currentData.length;
-      document.getElementById('tabCountBadge').textContent = currentData.length;
+      document.getElementById('tabCountBadge').textContent = rawProcedures.length;
 
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
@@ -615,19 +694,21 @@
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition duration-150";
 
+        const normP = normalizePriority(proc.priority);
         let pBadge = '';
-        if (proc.priority.toLowerCase() === 'alta') {
+        if (normP === 'Alta') {
           pBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">Alta</span>`;
-        } else if (proc.priority.toLowerCase() === 'media') {
+        } else if (normP === 'Media') {
           pBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">Media</span>`;
         } else {
           pBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">Baja</span>`;
         }
 
+        const normS = normalizeStatus(proc.status);
         let sBadge = '';
-        if (proc.status.toLowerCase().includes('finalizado')) {
+        if (normS === 'Finalizado') {
           sBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 justify-center"><i class="fa-solid fa-check"></i> Finalizado</span>`;
-        } else if (proc.status.toLowerCase().includes('proceso')) {
+        } else if (normS === 'En proceso') {
           sBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1 justify-center"><i class="fa-solid fa-clock"></i> En proceso</span>`;
         } else {
           sBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700/60 flex items-center gap-1 justify-center">Por iniciar</span>`;
@@ -658,7 +739,7 @@
       let csv = "ID,Area,Procedimiento,Prioridad,Estatus\n";
       rawProcedures.forEach(p => {
         const safeName = `"${p.name.replace(/"/g, '""')}"`;
-        csv += `${p.id},"${p.area}",${safeName},"${p.priority}","${p.status}"\n`;
+        csv += `${p.id},"${p.area}",${safeName},"${normalizePriority(p.priority)}","${normalizeStatus(p.status)}"\n`;
       });
       const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement("a");
@@ -681,9 +762,9 @@
       Chart.defaults.color = '#94a3b8';
       Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
 
-      const finCount = rawProcedures.filter(p => p.status.toLowerCase().includes('finalizado')).length;
-      const procCount = rawProcedures.filter(p => p.status.toLowerCase().includes('proceso')).length;
-      const pendCount = rawProcedures.filter(p => p.status.toLowerCase().includes('iniciar') || p.status.toLowerCase().includes('pendiente')).length;
+      const finCount = rawProcedures.filter(p => normalizeStatus(p.status) === 'Finalizado').length;
+      const procCount = rawProcedures.filter(p => normalizeStatus(p.status) === 'En proceso').length;
+      const pendCount = rawProcedures.filter(p => normalizeStatus(p.status) === 'Por iniciar').length;
 
       // 1. Chart Estatus
       if (chartInstanceEstatus) chartInstanceEstatus.destroy();
@@ -710,9 +791,9 @@
       });
 
       // 2. Chart Prioridad
-      const altaCount = rawProcedures.filter(p => p.priority.toLowerCase() === 'alta').length;
-      const mediaCount = rawProcedures.filter(p => p.priority.toLowerCase() === 'media').length;
-      const bajaCount = rawProcedures.filter(p => p.priority.toLowerCase() === 'baja').length;
+      const altaCount = rawProcedures.filter(p => normalizePriority(p.priority) === 'Alta').length;
+      const mediaCount = rawProcedures.filter(p => normalizePriority(p.priority) === 'Media').length;
+      const bajaCount = rawProcedures.filter(p => normalizePriority(p.priority) === 'Baja').length;
 
       if (chartInstancePrioridad) chartInstancePrioridad.destroy();
       const ctxPrioridad = document.getElementById('chartPrioridad').getContext('2d');
@@ -762,16 +843,16 @@
       });
 
       // 4. Chart Áreas
-      const areasList = [...new Set(rawProcedures.map(p => p.area))].sort();
+      const areasList = [...new Set(rawProcedures.map(p => p.area.trim()))].sort();
       const dataFin = [];
       const dataProc = [];
       const dataPend = [];
 
       areasList.forEach(a => {
-        const inArea = rawProcedures.filter(p => p.area === a);
-        dataFin.push(inArea.filter(p => p.status.toLowerCase().includes('finalizado')).length);
-        dataProc.push(inArea.filter(p => p.status.toLowerCase().includes('proceso')).length);
-        dataPend.push(inArea.filter(p => p.status.toLowerCase().includes('iniciar') || p.status.toLowerCase().includes('pendiente')).length);
+        const inArea = rawProcedures.filter(p => p.area.trim() === a);
+        dataFin.push(inArea.filter(p => normalizeStatus(p.status) === 'Finalizado').length);
+        dataProc.push(inArea.filter(p => normalizeStatus(p.status) === 'En proceso').length);
+        dataPend.push(inArea.filter(p => normalizeStatus(p.status) === 'Por iniciar').length);
       });
 
       if (chartInstanceAreas) chartInstanceAreas.destroy();
@@ -856,7 +937,8 @@
       if (!url) {
         if (icon) icon.classList.remove('fa-spin');
         if (text) text.textContent = 'Sincronizar Sheets';
-        openConfigModal();
+        updateKPIs();
+        renderCharts();
         return;
       }
 
@@ -888,8 +970,8 @@
                   id: idx + 1,
                   area: areaVal,
                   name: nameVal,
-                  priority: row[prioKey]?.trim() || 'Media',
-                  status: row[statusKey]?.trim() || 'Por iniciar'
+                  priority: normalizePriority(row[prioKey]),
+                  status: normalizeStatus(row[statusKey])
                 });
               }
             });
@@ -897,6 +979,7 @@
             if (parsed.length > 0) {
               rawProcedures.length = 0;
               parsed.forEach(p => rawProcedures.push(p));
+              updateKPIs();
               initFilters();
               renderTable();
               renderCharts();
@@ -914,6 +997,7 @@
     }
 
     window.onload = () => {
+      updateKPIs();
       initFilters();
       renderTable();
       renderCharts();
