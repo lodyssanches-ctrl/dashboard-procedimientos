@@ -467,7 +467,7 @@
 
         <div class="space-y-2">
           <label class="text-[11px] font-semibold text-slate-400 uppercase">URL CSV de Google Sheets</label>
-          <input type="text" id="sheetsCsvUrlInput" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv&gid=0" class="w-full bg-slate-950 border border-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <input type="text" id="sheetsCsvUrlInput" placeholder="https://docs.google.com/spreadsheets/d/e/2PACX-1vSplaLZaVIhWIRibETAyyPRFBGTJETXtLnyhqt-s0fcmWuSSiX_aSJT16pBt5p13mxnafvlU_C0BYKa/pub?gid=1701273546&single=true&output=csv" class="w-full bg-slate-950 border border-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
 
         <div class="p-3 bg-slate-950/70 rounded-xl text-[11px] text-slate-400 space-y-1.5 border border-slate-800">
@@ -505,6 +505,7 @@
     let chartInstanceCronograma = null;
     let chartInstanceAreas = null;
 
+    const DEFAULT_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSplaLZaVIhWIRibETAyyPRFBGTJETXtLnyhqt-s0fcmWuSSiX_aSJT16pBt5p13mxnafvlU_C0BYKa/pub?gid=1701273546&single=true&output=csv";
     const STORAGE_KEY = 'SHEETS_CSV_SYNC_URL';
 
     function normalizeStatus(st) {
@@ -907,7 +908,7 @@
     }
 
     function openConfigModal() {
-      const saved = localStorage.getItem(STORAGE_KEY) || '';
+      const saved = localStorage.getItem(STORAGE_KEY) || DEFAULT_SHEETS_CSV_URL;
       document.getElementById('sheetsCsvUrlInput').value = saved;
       document.getElementById('configModal').classList.remove('hidden');
     }
@@ -928,7 +929,7 @@
     }
 
     function syncGoogleSheets() {
-      const url = localStorage.getItem(STORAGE_KEY);
+      const url = localStorage.getItem(STORAGE_KEY) || DEFAULT_SHEETS_CSV_URL;
       const icon = document.getElementById('syncIcon');
       const text = document.getElementById('syncText');
       if (icon) icon.classList.add('fa-spin');
@@ -947,7 +948,8 @@
       Papa.parse(cacheBusterUrl, {
         download: true,
         header: true,
-        skipEmptyLines: true,
+        skipEmptyLines: 'greedy',
+        transformHeader: h => h.trim(),
         complete: function(results) {
           if (icon) icon.classList.remove('fa-spin');
           if (text) text.textContent = 'Sincronizado';
@@ -1001,9 +1003,8 @@
       initFilters();
       renderTable();
       renderCharts();
-      if (localStorage.getItem(STORAGE_KEY)) {
-        syncGoogleSheets();
-      }
+      // Sincronizar automáticamente en vivo para cualquier usuario que abra la página
+      syncGoogleSheets();
     };
   </script>
 </body>
